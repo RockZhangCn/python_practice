@@ -9,9 +9,11 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 #include <errno.h>
+#include <openssl/des.h>
 
 const int BUFFER_SIZE = 1024;
 
+int encrypt(/*unsigned char * inbuf, unsigned char ** outbuf, int inlen, unsigned char * iv*/);
 int main()
 {
     ///定义sockfd
@@ -149,6 +151,60 @@ int main()
         return errno;
     }
 
+    encrypt();
     close(sock_cli);
     return 0;
+}
+
+int encrypt(/*unsigned char * inbuf, unsigned char ** outbuf, int inlen, unsigned char * iv*/)
+{
+    /*
+
+    int padding = inlen % 8;
+    unsigned char * rawData = new unsigned char[inlen + 8 - padding];
+    memcpy(rawData, inbuf, inlen);
+    memset(rawData + inlen, 8-padding, 8-padding); 
+
+
+    DES_key_schedule schedule;
+
+    const_DES_cblock input;
+
+    DES_cblock output;
+    DES_cblock ivec;
+
+    */
+    //////////////////////////////////////
+
+
+    DES_cblock key ;
+    memcpy(&key, "rocksnzhang", 8);
+    //随机密钥  
+    //DES_random_key(&key);  
+  
+    DES_key_schedule schedule;  
+    //转换成schedule  
+    DES_set_key_checked(&key, &schedule);   
+  
+    const_DES_cblock input = "hehehe";  
+    DES_cblock output;  
+  
+    printf("cleartext: %s\n", input);  
+  
+    //加密  
+    DES_ecb_encrypt(&input, &output, &schedule, DES_ENCRYPT);  
+    printf("Encrypted!\n");  
+  
+    printf("ciphertext: ");  
+    int i;  
+    for (i = 0; i < sizeof(input); i++)  
+         printf("%02x", output[i]);  
+    printf("\n");  
+  
+    //解密  
+    DES_ecb_encrypt(&output, &input, &schedule, DES_DECRYPT);  
+    printf("Decrypted!\n");  
+    printf("cleartext:%s\n", input);  
+  
+    return 0;  
 }
